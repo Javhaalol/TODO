@@ -1,0 +1,738 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#f7f7f7" />
+    <title>TODO LIST</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Kanit:wght@400;500&family=Inter:wght@500;700&family=Raleway:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        color-scheme: light;
+        --primary: #6c63ff;
+        --primary-dark: #534cc2;
+        --primary-hover: #5850dd;
+        --bg: #f7f7f7;
+        --field: #ffffff;
+        --text: #252525;
+        --muted: #c3c1e5;
+        --muted-2: #666666;
+        --radius: 5px;
+        --font-ui: "Kanit", system-ui, sans-serif;
+        --font-body: "Inter", system-ui, sans-serif;
+        --font-num: "Raleway", system-ui, sans-serif;
+      }
+      [data-theme="dark"] {
+        color-scheme: dark;
+        --bg: #252525;
+        --field: rgba(255, 255, 255, 0.05);
+        --text: #f7f7f7;
+        --muted: #666666;
+        --muted-2: #8a8a8f;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      body {
+        min-height: 100vh;
+        font-family: var(--font-ui);
+        color: var(--text);
+        background: var(--bg);
+        display: grid;
+        place-items: start center;
+        padding: 40px 18px 72px;
+        transition: background 0.3s, color 0.3s;
+      }
+      .app {
+        width: 100%;
+        max-width: 750px;
+      }
+
+      /* HEAD */
+      .head {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+      .head h1 {
+        flex: 1;
+        text-align: center;
+        font-size: 26px;
+        font-weight: 500;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+      }
+      .palette {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      .swatch {
+        width: 20px;
+        height: 20px;
+        border-radius: var(--radius);
+        border: 2px solid transparent;
+        cursor: pointer;
+      }
+      .swatch.light {
+        background: #f7f7f7;
+        border-color: #d9d9d9;
+      }
+      .swatch.dark {
+        background: #252525;
+      }
+      .swatch.on {
+        border-color: var(--primary);
+      }
+
+      .headrow {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        margin-bottom: 34px;
+      }
+      .search {
+        flex: 0 1 595px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        height: 38px;
+        padding: 8px 16px;
+        border-radius: var(--radius);
+        background: var(--field);
+      }
+      .search svg {
+        flex: none;
+        opacity: 0.7;
+      }
+      .search input {
+        flex: 1;
+        min-width: 0;
+        border: none;
+        outline: none;
+        background: transparent;
+        font-family: var(--font-body);
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--text);
+      }
+      .search input::placeholder {
+        color: var(--muted);
+      }
+
+      /* filter button + menu */
+      .filter {
+        position: relative;
+        flex: none;
+      }
+      .filter-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+        min-width: 85px;
+        height: 38px;
+        padding: 0 10px;
+        border: none;
+        border-radius: var(--radius);
+        background: var(--primary);
+        color: #f7f7f7;
+        font-family: var(--font-ui);
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .filter-btn:hover {
+        background: var(--primary-hover);
+      }
+      .filter-btn.open {
+        background: var(--primary-dark);
+      }
+      .menu {
+        position: absolute;
+        top: calc(100% + 8px);
+        right: 0;
+        z-index: 20;
+        display: none;
+        flex-direction: column;
+        gap: 8px;
+        padding: 8px;
+        border-radius: var(--radius);
+        background: var(--field);
+        box-shadow: 0 12px 30px rgba(37, 37, 37, 0.16);
+      }
+      [data-theme="dark"] .menu {
+        background: #2f2f2f;
+      }
+      .menu.open {
+        display: flex;
+      }
+      .menu button {
+        border: none;
+        background: none;
+        text-align: left;
+        font-family: var(--font-ui);
+        font-size: 16px;
+        font-weight: 400;
+        color: var(--primary);
+        padding: 2px 8px;
+        cursor: pointer;
+        white-space: nowrap;
+      }
+      .menu button:hover {
+        color: var(--primary-hover);
+      }
+
+      /* undo */
+      .toolbar {
+        display: flex;
+        align-items: center;
+        justify-content: flex-end;
+        margin-bottom: 12px;
+      }
+      .undo {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-family: var(--font-num);
+        font-size: 16px;
+        color: #f7f7f7;
+        background: var(--primary);
+        padding: 6px 14px;
+        border-radius: var(--radius);
+        border: none;
+        cursor: pointer;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s, background 0.2s;
+      }
+      .undo.show {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .undo:hover {
+        background: var(--primary-hover);
+      }
+      .undo b {
+        font-weight: 700;
+      }
+
+      /* list */
+      .listwrap {
+        width: 520px;
+        max-width: 100%;
+        margin: 0 auto;
+      }
+      ul.notes {
+        list-style: none;
+        display: flex;
+        flex-direction: column;
+        gap: 34px;
+      }
+      li.note {
+        display: flex;
+        align-items: center;
+        gap: 17px;
+      }
+      .tick {
+        flex: none;
+        width: 26px;
+        height: 26px;
+        border-radius: 2px;
+        border: 1.5px solid var(--muted);
+        background: transparent;
+        display: grid;
+        place-items: center;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .tick:hover {
+        border-color: var(--primary);
+      }
+      .tick.on {
+        background: var(--primary);
+        border-color: var(--primary);
+      }
+      .tick.on::after {
+        content: "";
+        width: 6px;
+        height: 11px;
+        border: solid #fff;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg) translate(-1px, -1px);
+      }
+      li.note .txt {
+        flex: 1;
+        min-width: 0;
+        font-size: 20px;
+        font-weight: 500;
+        line-height: 20px;
+        word-break: break-word;
+      }
+      li.note.done .txt {
+        font-weight: 400;
+      }
+      li.note .acts {
+        flex: none;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      li.note .iconbtn {
+        width: 18px;
+        height: 18px;
+        padding: 0;
+        border: none;
+        background: none;
+        color: var(--muted-2);
+        cursor: pointer;
+        display: grid;
+        place-items: center;
+        transition: color 0.15s;
+      }
+      li.note .iconbtn:hover {
+        color: var(--primary);
+      }
+      .empty {
+        text-align: center;
+        padding: 60px 16px;
+        font-size: 20px;
+        font-weight: 400;
+        color: var(--muted-2);
+      }
+
+      /* add button — bottom right */
+      .fab {
+        position: fixed;
+        right: 28px;
+        bottom: 28px;
+        z-index: 30;
+        width: 58px;
+        height: 58px;
+        border: none;
+        border-radius: var(--radius);
+        background: var(--primary);
+        color: #f7f7f7;
+        font-family: var(--font-ui);
+        font-size: 30px;
+        font-weight: 400;
+        line-height: 1;
+        cursor: pointer;
+        box-shadow: 0 14px 30px rgba(108, 99, 255, 0.45);
+        transition: background 0.15s, transform 0.15s;
+      }
+      .fab:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+      }
+
+      /* modal */
+      .overlay {
+        position: fixed;
+        inset: 0;
+        z-index: 40;
+        background: rgba(37, 37, 37, 0.45);
+        display: grid;
+        place-items: center;
+        padding: 20px;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s;
+      }
+      .overlay.open {
+        opacity: 1;
+        pointer-events: auto;
+      }
+      .modal {
+        width: 100%;
+        max-width: 440px;
+        background: var(--field);
+        border-radius: var(--radius);
+        padding: 24px;
+        box-shadow: 0 24px 60px rgba(37, 37, 37, 0.22);
+      }
+      [data-theme="dark"] .modal {
+        background: #2f2f2f;
+      }
+      .modal h2 {
+        font-size: 24px;
+        font-weight: 500;
+        margin-bottom: 16px;
+      }
+      .modal input {
+        width: 100%;
+        height: 38px;
+        padding: 8px 16px;
+        border-radius: var(--radius);
+        border: none;
+        outline: none;
+        background: rgba(108, 99, 255, 0.08);
+        font-family: var(--font-body);
+        font-size: 16px;
+        font-weight: 500;
+        color: var(--text);
+      }
+      .modal input::placeholder {
+        color: var(--muted);
+      }
+      .modal .row {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+      }
+      .modal button {
+        height: 38px;
+        padding: 0 22px;
+        border: none;
+        border-radius: var(--radius);
+        font-family: var(--font-ui);
+        font-size: 18px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
+      .modal .cancel {
+        background: transparent;
+        color: var(--primary);
+      }
+      .modal .cancel:hover {
+        background: rgba(108, 99, 255, 0.1);
+      }
+      .modal .apply {
+        background: var(--primary);
+        color: #f7f7f7;
+      }
+      .modal .apply:hover {
+        background: var(--primary-hover);
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          transition-duration: 0.01ms !important;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="app">
+      <div class="head">
+        <h1>TODO LIST</h1>
+        <div class="palette" role="group" aria-label="Color mode">
+          <button class="swatch light" data-theme-btn="light" aria-label="Light mode"></button>
+          <button class="swatch dark" data-theme-btn="dark" aria-label="Dark mode"></button>
+        </div>
+      </div>
+
+      <div class="headrow">
+        <label class="search">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7" />
+            <path d="M20 20l-3.5-3.5" />
+          </svg>
+          <input id="q" type="search" placeholder="Search note..." aria-label="Search notes" />
+        </label>
+        <div class="filter">
+          <button class="filter-btn" id="filterBtn" aria-haspopup="true" aria-expanded="false">
+            <span id="filterLabel">all</span><span>▾</span>
+          </button>
+          <div class="menu" id="filterMenu" role="menu">
+            <button data-val="all">all</button>
+            <button data-val="complete">Complete</button>
+            <button data-val="incomplete">Incomplete</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="toolbar">
+        <button class="undo" id="undo"><b id="undoCount">0</b> undo</button>
+      </div>
+
+      <div class="listwrap">
+        <ul class="notes" id="list"></ul>
+      </div>
+    </main>
+
+    <button class="fab" id="add" aria-label="Add note">＋</button>
+
+    <div class="overlay" id="overlay">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+        <h2 id="modalTitle">New Note</h2>
+        <input id="noteInput" type="text" placeholder="Input your note..." />
+        <div class="row">
+          <button class="cancel" id="cancel">Cancel</button>
+          <button class="apply" id="apply">Apply</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      (function () {
+        "use strict";
+        var KEY = "todo-list-v1";
+        var listEl = document.getElementById("list");
+        var q = document.getElementById("q");
+        var filterBtn = document.getElementById("filterBtn");
+        var filterMenu = document.getElementById("filterMenu");
+        var filterLabel = document.getElementById("filterLabel");
+        var overlay = document.getElementById("overlay");
+        var noteInput = document.getElementById("noteInput");
+        var undoBtn = document.getElementById("undo");
+        var undoCount = document.getElementById("undoCount");
+        var undoStack = [];
+        var filter = "all";
+        var notes = load();
+
+        var TRASH =
+          "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' aria-hidden='true'>" +
+          "<path d='M3 6h18M8 6V4h8v2M6 6l1 14h10l1-14'/></svg>";
+        var PENCIL =
+          "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' aria-hidden='true'>" +
+          "<path d='M4 20h4L20 8l-4-4L4 16v4z'/><path d='M14 6l4 4'/></svg>";
+        var editingId = null;
+
+        function load() {
+          try {
+            var raw = localStorage.getItem(KEY);
+            if (!raw) return seed();
+            var a = JSON.parse(raw);
+            return Array.isArray(a) ? a : [];
+          } catch (e) {
+            return seed();
+          }
+        }
+        function seed() {
+          return [
+            { id: uid(), text: "Note #1", done: false },
+            { id: uid(), text: "Note #2", done: true },
+            { id: uid(), text: "Note #3", done: false }
+          ];
+        }
+        function save() {
+          try {
+            localStorage.setItem(KEY, JSON.stringify(notes));
+          } catch (e) {}
+        }
+        function uid() {
+          return Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        }
+        function esc(s) {
+          return String(s).replace(/[&<>"]/g, function (c) {
+            return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c];
+          });
+        }
+        function updateUndo() {
+          undoCount.textContent = String(undoStack.length);
+          undoBtn.classList.toggle("show", undoStack.length > 0);
+        }
+        function visible() {
+          var term = q.value.trim().toLowerCase();
+          return notes.filter(function (n) {
+            var okF =
+              filter === "all" ||
+              (filter === "complete" && n.done) ||
+              (filter === "incomplete" && !n.done);
+            var okT = !term || n.text.toLowerCase().indexOf(term) > -1;
+            return okF && okT;
+          });
+        }
+        function render() {
+          var items = visible();
+          if (!items.length) {
+            listEl.innerHTML = "<li class='empty'>Empty...</li>";
+            return;
+          }
+          listEl.innerHTML = items
+            .map(function (n) {
+              return (
+                "<li class='note" +
+                (n.done ? " done" : "") +
+                "' data-id='" +
+                n.id +
+                "'>" +
+                "<button class='tick" +
+                (n.done ? " on" : "") +
+                "' data-act='toggle' aria-label='Toggle note'></button>" +
+                "<span class='txt'>" +
+                esc(n.text) +
+                "</span>" +
+                "<span class='acts'>" +
+                "<button class='iconbtn' data-act='edit' aria-label='Edit note'>" +
+                PENCIL +
+                "</button>" +
+                "<button class='iconbtn' data-act='del' aria-label='Delete note'>" +
+                TRASH +
+                "</button>" +
+                "</span>" +
+                "</li>"
+              );
+            })
+            .join("");
+        }
+        function addNote(text) {
+          if (!text) return;
+          notes.unshift({ id: uid(), text: text, done: false });
+          save();
+          render();
+        }
+        function openModal(id) {
+          editingId = id || null;
+          overlay.classList.add("open");
+          if (editingId) {
+            var n = notes.filter(function (x) {
+              return x.id === editingId;
+            })[0];
+            document.getElementById("modalTitle").textContent = "Edit Note";
+            noteInput.value = n ? n.text : "";
+          } else {
+            document.getElementById("modalTitle").textContent = "New Note";
+            noteInput.value = "";
+          }
+          setTimeout(function () {
+            noteInput.focus();
+            noteInput.select();
+          }, 60);
+        }
+        function closeModal() {
+          overlay.classList.remove("open");
+          editingId = null;
+        }
+        function closeMenu() {
+          filterMenu.classList.remove("open");
+          filterBtn.classList.remove("open");
+          filterBtn.setAttribute("aria-expanded", "false");
+        }
+
+        filterBtn.addEventListener("click", function (e) {
+          e.stopPropagation();
+          var open = filterMenu.classList.toggle("open");
+          filterBtn.classList.toggle("open", open);
+          filterBtn.setAttribute("aria-expanded", String(open));
+        });
+        filterMenu.addEventListener("click", function (e) {
+          var b = e.target.closest("button");
+          if (!b) return;
+          filter = b.getAttribute("data-val");
+          filterLabel.textContent = b.textContent;
+          closeMenu();
+          render();
+        });
+        document.addEventListener("click", closeMenu);
+
+        listEl.addEventListener("click", function (e) {
+          var btn = e.target.closest("[data-act]");
+          if (!btn) return;
+          var li = btn.closest(".note");
+          var id = li.getAttribute("data-id");
+          var i = notes.findIndex(function (n) {
+            return n.id === id;
+          });
+          if (i < 0) return;
+          if (btn.getAttribute("data-act") === "toggle") {
+            notes[i].done = !notes[i].done;
+          } else if (btn.getAttribute("data-act") === "edit") {
+            openModal(id);
+            return;
+          } else {
+            undoStack.push(notes[i]);
+            notes.splice(i, 1);
+          }
+          save();
+          render();
+          updateUndo();
+        });
+        undoBtn.addEventListener("click", function () {
+          var n = undoStack.pop();
+          if (!n) return;
+          notes.unshift(n);
+          save();
+          render();
+          updateUndo();
+        });
+
+        q.addEventListener("input", render);
+
+        document.getElementById("apply").addEventListener("click", function () {
+          var v = noteInput.value.trim();
+          if (editingId) {
+            var i = notes.findIndex(function (n) {
+              return n.id === editingId;
+            });
+            if (i > -1) {
+              if (v) notes[i].text = v;
+              else notes.splice(i, 1);
+              save();
+              render();
+            }
+          } else {
+            addNote(v);
+          }
+          closeModal();
+        });
+        document.getElementById("add").addEventListener("click", function () {
+          openModal(null);
+        });
+        document.getElementById("cancel").addEventListener("click", closeModal);
+        noteInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            document.getElementById("apply").click();
+          }
+        });
+        overlay.addEventListener("click", function (e) {
+          if (e.target === overlay) closeModal();
+        });
+        document.addEventListener("keydown", function (e) {
+          if (e.key === "Escape") {
+            closeModal();
+            closeMenu();
+          }
+        });
+
+        Array.prototype.forEach.call(
+          document.querySelectorAll("[data-theme-btn]"),
+          function (b) {
+            b.addEventListener("click", function () {
+              applyTheme(b.getAttribute("data-theme-btn"));
+            });
+          },
+        );
+        function applyTheme(t) {
+          document.documentElement.setAttribute("data-theme", t);
+          Array.prototype.forEach.call(
+            document.querySelectorAll(".swatch"),
+            function (s) {
+              s.classList.toggle("on", s.getAttribute("data-theme-btn") === t);
+            },
+          );
+          document
+            .querySelector('meta[name="theme-color"]')
+            .setAttribute("content", t === "dark" ? "#252525" : "#f7f7f7");
+          try {
+            localStorage.setItem("todo-theme", t);
+          } catch (e) {}
+        }
+        var savedTheme = null;
+        try {
+          savedTheme = localStorage.getItem("todo-theme");
+        } catch (e) {}
+        applyTheme(savedTheme || "light");
+
+        render();
+        updateUndo();
+      })();
+    </script>
+  </body>
+</html>
